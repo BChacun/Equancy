@@ -3,10 +3,11 @@ import pandas as pd
 import numpy as np
 
 
-def app():
+def app(df):
     st.title('ARIMA Algorithm')
     st.write('Welcome to app1')
-
+    
+    
 
 
 
