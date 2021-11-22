@@ -13,7 +13,7 @@ def app(df):
     
     
    
-    def AR():
+    def AR(p):
 
         
         # IMPORTS :
@@ -28,7 +28,9 @@ def app(df):
         from pandas import concat
         from pandas.plotting import autocorrelation_plot
         
-        # AR :
+        # AR (p):
+        # paramètre p : l'AR prend en compte les p valeurs précédentes pour calculer la prédiction
+        
         
     
         # create and evaluate a static autoregressive model
@@ -38,22 +40,22 @@ def app(df):
         
         # split dataset
         X = df.values
-        train, test = X[1:len(X)-7], X[len(X)-7:]
+        train, test = X[0:p], X[p:]
         # train autoregression
-        model = AutoReg(train, lags=29)
+        model = AutoReg(X,p)
         model_fit = model.fit()
         print('Coefficients: %s' % model_fit.params)
         # make predictions
-        predictions = model_fit.predict(start=len(train), end=len(train)+len(test)-1, dynamic=False)
+        predictions = model_fit.predict(start=0, end=len(X)-1, dynamic=False)
         for i in range(len(predictions)):
-        	print('predicted=%f, expected=%f' % (predictions[i], test[i]))
-        rmse = sqrt(mean_squared_error(test, predictions))
+        	print('predicted=%f, expected=%f' % (predictions[i], X[i]))
+        rmse = sqrt(mean_squared_error(test, predictions[p:]))
         print('Test RMSE: %.3f' % rmse)
         
         
         
         # create results
-        results = df[len(X)-7:]
+        results = df
         results["Prediction"] = predictions
         
         results.to_csv(os.getcwd() + r'\AR.csv')
@@ -61,15 +63,17 @@ def app(df):
     try :
         data = pd.read_csv("AR.csv")
     except :
-        AR()
+        AR(50)
         data = pd.read_csv("AR.csv")
         
-    data["timestamp"] = pd.to_datetime(data['timestamp'])
-    data.set_index(['timestamp'],inplace=True)
+
+    data["weekDate"] = pd.to_datetime(data['weekDate'])
+    data.set_index(['weekDate'],inplace=True)
     st.write(data)
     
     # Plots :
     st.line_chart(data=data, width=0, height=0, use_container_width=True)
+
 
 
 

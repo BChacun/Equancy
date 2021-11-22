@@ -7,31 +7,39 @@ st.title('Algorithms :')
 # Création du Database
 
 @st.cache
-def load_data(n):
-    data = pd.read_csv(r'C:\Users\Tddon\PJE FB Prophet\Equancy\DATABASE.txt', sep=";", header=None, na_values=['?'])
+def load_data(product_id, store_id):
+    sales_df = pd.read_parquet('sales_data.parquet')
+    data = (sales_df
+ # On sélectionne le produit 6716 dans le magasin 171
+ .query(f'product_id == {product_id} and store_id == {store_id}')
 
-    data = data[:n]
+ # On convertit la date en datetime
+ .assign(date=lambda _df: pd.to_datetime(_df['date']))
 
-    data = data.rename(columns=data.iloc[0]).drop(data.index[0])
+ # On calcule la date du lundi de la semaine de CAL_Date
+ .assign(weekDate=lambda _df: _df['date'] - _df['date'].dt.weekday * np.timedelta64(1, 'D'))
 
-    data["Time_index2"] = data["Date"] + " " + data["Time"]
-
-    data["timestamp"] = pd.to_datetime(data['Time_index2'], format='%d/%m/%Y %H:%M:%S')
-    data.set_index(['timestamp'],inplace=True)
-
-    data["Global_active_power"] = data["Global_active_power"].astype(float)
-
-    df = pd.DataFrame(data, columns=['Global_active_power'])
-
-    df = df.rename(columns={'Global_active_power': 'Y'})
-    
+ # On groupe les ventes à la semaine
+ .groupby(['weekDate'])
+ .agg(
+     quantity_weekly=('quantity', 'sum')
+ )
+            .reset_index()
+ .set_index('weekDate')
+ [['quantity_weekly']]
+       );
+    df = pd.DataFrame(data)
     return df
 
-df = load_data(1000)
+
+
+df = load_data(2008,9)
 
 # Pages :
 import AR
 import ARIMA
+
+
 
 PAGES = {
     "AR": AR,
