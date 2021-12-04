@@ -1,11 +1,12 @@
 from datetime import time
 import time
 import streamlit as st
-from statsmodels.tsa.arima.model import ARIMA as ARIMA_model
 import pandas as pd
 import math
 from sklearn.metrics import *
 from math import sqrt
+
+from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 
 
 def separate_data(data, frac):
@@ -24,74 +25,54 @@ def indicateurs_stats(test, predictions):
     return mean_error, mae, rmse, mape, mapd
 
 
-results, mean_error, mae, rmse, mape, mapd, duree = None, None, None, None, None, None, None
+results, exp_smoothing, mean_error, mae, rmse, mape, mapd, duree = None, None, None, None, None, None, None, None
 data_prec = None
-p_prec, d_prec, q_prec = None, None, None
-change = False
-
 
 def app(df):
-    st.markdown('<h1><center><span style="color:#00BFFF"><U>ARIMA</U></center></h1>', unsafe_allow_html=True)
-    st.markdown('<h0><center>_Autoregressive Integrated Moving Average model_</center></h1>', unsafe_allow_html=True)
 
-    def ARIMA(p, d, q):
+    st.markdown('<h1><center><span style="color:#00BFFF"><U>SES</U></center></h1>', unsafe_allow_html=True)
+    st.markdown('<h0><center>_Simple Exponential Smoothing_</center></h1>', unsafe_allow_html=True)
 
+    def SES():
         # Split dataset
         res = separate_data(df, 0.8)
         train, test = res[0], res[1]
 
         # Train model
         start = time.time()
-        model = ARIMA_model(train.values, order=(p, d, q))
-        model_fit = model.fit()
+        model = SimpleExpSmoothing(train.values, initialization_method="estimated")
+        model_fit = model.fit(optimized=True)
 
         # Make predictions
         prediction = model_fit.forecast(len(test))
         predictions = pd.Series(prediction, index=test.index)
         end = time.time()
-        duree = end - start
+        duree = end-start
         mean_error, mae, rmse, mape, mapd = indicateurs_stats(test, predictions)
+
         # Create results
         results = df
         results = results.to_frame()
         results["Prediction"] = predictions
-        return results, mean_error, mae, rmse, mape, mapd, duree
+        print()
+        return results, model.params['smoothing_level'], mean_error, mae, rmse, mape, mapd, duree
 
-    global results, mean_error, mae, rmse, mape, mapd, duree
+    global results, exp_smoothing, mean_error, mae, rmse, mape, mapd, duree
     global data_prec
-    global p_prec, d_prec, q_prec, change
 
     st.markdown('<h5><U>Parameters :</U></h5>', unsafe_allow_html=True)
-    p = st.number_input('Choose p', min_value=1, max_value=100, value=30, step=1)
-    if p_prec != p:
-        p_prec = p
-        change = True
-    d = st.number_input('Choose d', min_value=0, max_value=2, value=1, step=1)
-    if d_prec != d:
-        d_prec = d
-        change = True
-    q = st.number_input('Choose q', min_value=0, max_value=100, value=10, step=1)
-    if q_prec != q:
-        q_prec = q
-        change = True
 
     if results is None:
         data_prec = df
         with st.spinner('Wait for it: 1st loading'):
-            results, mean_error, mae, rmse, mape, mapd, duree = ARIMA(p, d, q)
-            change = False
-
-    elif change:
-        data_prec = df
-        with st.spinner('Wait for it: reloading'):
-            results, mean_error, mae, rmse, mape, mapd, duree = ARIMA(p, d, q)
-            change = False
+            results, mean_error, mae, rmse, mape, mapd, duree, exp_smoothing = SES()
 
     elif not df.equals(data_prec):
         data_prec = df
         with st.spinner('Wait for it: data has changed'):
-            results, mean_error, mae, rmse, mape, mapd, duree = ARIMA(p, d, q)
-            change = False
+            results, mean_error, mae, rmse, mape, mapd, duree, exp_smoothing = SES()
+
+    st.write("α = ", exp_smoothing)
 
     def plot_streamlit(results, mean_error, mae, rmse, mape, mapd, duree):
         st.markdown('<h5><U>Results :</U></h5>', unsafe_allow_html=True)

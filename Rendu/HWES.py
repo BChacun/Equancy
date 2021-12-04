@@ -1,11 +1,12 @@
 from datetime import time
 import time
 import streamlit as st
-from statsmodels.tsa.arima.model import ARIMA as ARIMA_model
 import pandas as pd
 import math
 from sklearn.metrics import *
 from math import sqrt
+
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 
 def separate_data(data, frac):
@@ -24,17 +25,15 @@ def indicateurs_stats(test, predictions):
     return mean_error, mae, rmse, mape, mapd
 
 
-results, mean_error, mae, rmse, mape, mapd, duree = None, None, None, None, None, None, None
-data_prec = None
-p_prec, d_prec, q_prec = None, None, None
+results, mean_error, mae, rmse, mape, mapd, duree, S_prec = None, None, None, None, None, None, None, None
 change = False
-
+data_prec = None
 
 def app(df):
-    st.markdown('<h1><center><span style="color:#00BFFF"><U>ARIMA</U></center></h1>', unsafe_allow_html=True)
-    st.markdown('<h0><center>_Autoregressive Integrated Moving Average model_</center></h1>', unsafe_allow_html=True)
+    st.markdown('<h1><center><span style="color:#00BFFF"><U>HWES</U></center></h1>', unsafe_allow_html=True)
+    st.markdown('<h0><center>_Holt-Winters Exponential Smoothing_</center></h1>', unsafe_allow_html=True)
 
-    def ARIMA(p, d, q):
+    def HWES(S):
 
         # Split dataset
         res = separate_data(df, 0.8)
@@ -42,55 +41,47 @@ def app(df):
 
         # Train model
         start = time.time()
-        model = ARIMA_model(train.values, order=(p, d, q))
-        model_fit = model.fit()
+        model = ExponentialSmoothing(train.values,trend='add',seasonal='add',initialization_method="estimated", seasonal_periods=S)
+        model_fit = model.fit(optimized=True)
 
         # Make predictions
         prediction = model_fit.forecast(len(test))
         predictions = pd.Series(prediction, index=test.index)
         end = time.time()
-        duree = end - start
+        duree = end-start
         mean_error, mae, rmse, mape, mapd = indicateurs_stats(test, predictions)
+
         # Create results
         results = df
         results = results.to_frame()
         results["Prediction"] = predictions
         return results, mean_error, mae, rmse, mape, mapd, duree
 
-    global results, mean_error, mae, rmse, mape, mapd, duree
+    global results, mean_error, mae, rmse, mape, mapd, duree, change, S_prec
     global data_prec
-    global p_prec, d_prec, q_prec, change
 
     st.markdown('<h5><U>Parameters :</U></h5>', unsafe_allow_html=True)
-    p = st.number_input('Choose p', min_value=1, max_value=100, value=30, step=1)
-    if p_prec != p:
-        p_prec = p
+    S = st.slider('S', min_value=1, max_value=50, value=50, step=1)
+    if S_prec != S:
+        S_prec = S
         change = True
-    d = st.number_input('Choose d', min_value=0, max_value=2, value=1, step=1)
-    if d_prec != d:
-        d_prec = d
-        change = True
-    q = st.number_input('Choose q', min_value=0, max_value=100, value=10, step=1)
-    if q_prec != q:
-        q_prec = q
-        change = True
-
+    st.write("Seasonal periods = ", S)
     if results is None:
         data_prec = df
         with st.spinner('Wait for it: 1st loading'):
-            results, mean_error, mae, rmse, mape, mapd, duree = ARIMA(p, d, q)
+            results, mean_error, mae, rmse, mape, mapd, duree = HWES(S)
             change = False
 
     elif change:
         data_prec = df
         with st.spinner('Wait for it: reloading'):
-            results, mean_error, mae, rmse, mape, mapd, duree = ARIMA(p, d, q)
+            results, mean_error, mae, rmse, mape, mapd, duree = HWES(S)
             change = False
 
     elif not df.equals(data_prec):
         data_prec = df
         with st.spinner('Wait for it: data has changed'):
-            results, mean_error, mae, rmse, mape, mapd, duree = ARIMA(p, d, q)
+            results, mean_error, mae, rmse, mape, mapd, duree = HWES(S)
             change = False
 
     def plot_streamlit(results, mean_error, mae, rmse, mape, mapd, duree):

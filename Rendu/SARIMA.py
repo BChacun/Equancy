@@ -1,11 +1,11 @@
 from datetime import time
 import time
 import streamlit as st
-from statsmodels.tsa.arima.model import ARIMA as ARIMA_model
 import pandas as pd
 import math
 from sklearn.metrics import *
 from math import sqrt
+from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 
 def separate_data(data, frac):
@@ -26,24 +26,25 @@ def indicateurs_stats(test, predictions):
 
 results, mean_error, mae, rmse, mape, mapd, duree = None, None, None, None, None, None, None
 data_prec = None
-p_prec, d_prec, q_prec = None, None, None
+p_prec, d_prec, q_prec,  P_prec, D_prec, Q_prec, m_prec = None, None, None, None, None, None, None
 change = False
 
 
 def app(df):
-    st.markdown('<h1><center><span style="color:#00BFFF"><U>ARIMA</U></center></h1>', unsafe_allow_html=True)
-    st.markdown('<h0><center>_Autoregressive Integrated Moving Average model_</center></h1>', unsafe_allow_html=True)
+    st.markdown('<h1><center><span style="color:#00BFFF"><U>SARIMA</U></center></h1>', unsafe_allow_html=True)
+    st.markdown('<h0><center>_Seasonal Autoregressive Integrated Moving Average_</center></h1>', unsafe_allow_html=True)
 
-    def ARIMA(p, d, q):
-
+    def SARIMA(param, param_seasonal):
         # Split dataset
+        # param = (p, d, q)
+        # param_seasonal = (P, D, Q, m)
         res = separate_data(df, 0.8)
         train, test = res[0], res[1]
 
         # Train model
         start = time.time()
-        model = ARIMA_model(train.values, order=(p, d, q))
-        model_fit = model.fit()
+        model = SARIMAX(train.values, order=param, seasonal_order=param_seasonal)
+        model_fit = model.fit(optimized=True)
 
         # Make predictions
         prediction = model_fit.forecast(len(test))
@@ -51,6 +52,7 @@ def app(df):
         end = time.time()
         duree = end - start
         mean_error, mae, rmse, mape, mapd = indicateurs_stats(test, predictions)
+
         # Create results
         results = df
         results = results.to_frame()
@@ -59,38 +61,64 @@ def app(df):
 
     global results, mean_error, mae, rmse, mape, mapd, duree
     global data_prec
-    global p_prec, d_prec, q_prec, change
+    global p_prec, d_prec, q_prec,  P_prec, D_prec, Q_prec, m_prec
+    global change
 
     st.markdown('<h5><U>Parameters :</U></h5>', unsafe_allow_html=True)
-    p = st.number_input('Choose p', min_value=1, max_value=100, value=30, step=1)
+
+    c1, c2 = st.columns(2)
+    p = c1.number_input('Choose p', min_value=1, max_value=100, value=1, step=1)
     if p_prec != p:
         p_prec = p
         change = True
-    d = st.number_input('Choose d', min_value=0, max_value=2, value=1, step=1)
+    d = c1.number_input('Choose d', min_value=0, max_value=2, value=1, step=1)
     if d_prec != d:
         d_prec = d
         change = True
-    q = st.number_input('Choose q', min_value=0, max_value=100, value=10, step=1)
+    q = c1.number_input('Choose q', min_value=0, max_value=100, value=1, step=1)
     if q_prec != q:
         q_prec = q
         change = True
 
+    P = c2.number_input('Choose P', min_value=1, max_value=100, value=1, step=1)
+    if P_prec != P:
+        P_prec = P
+        change = True
+
+    D = c2.number_input('Choose D', min_value=0, max_value=2, value=1, step=1)
+    if D_prec != D:
+        D_prec = D
+        change = True
+
+    Q = c2.number_input('Choose Q', min_value=0, max_value=100, value=0, step=1)
+    if Q_prec != Q:
+        Q_prec = Q
+        change = True
+
+    m = c2.number_input('Choose m', min_value=0, max_value=100, value=49, step=1)
+    if m_prec != m:
+        m_prec = m
+        change = True
+
+    param = (p, d, q)
+    param_seasonal = (P, D, Q, m)
+
     if results is None:
         data_prec = df
         with st.spinner('Wait for it: 1st loading'):
-            results, mean_error, mae, rmse, mape, mapd, duree = ARIMA(p, d, q)
+            results, mean_error, mae, rmse, mape, mapd, duree = SARIMA(param, param_seasonal)
             change = False
 
     elif change:
         data_prec = df
         with st.spinner('Wait for it: reloading'):
-            results, mean_error, mae, rmse, mape, mapd, duree = ARIMA(p, d, q)
+            results, mean_error, mae, rmse, mape, mapd, duree = SARIMA(param, param_seasonal)
             change = False
 
     elif not df.equals(data_prec):
         data_prec = df
         with st.spinner('Wait for it: data has changed'):
-            results, mean_error, mae, rmse, mape, mapd, duree = ARIMA(p, d, q)
+            results, mean_error, mae, rmse, mape, mapd, duree = SARIMA(param, param_seasonal)
             change = False
 
     def plot_streamlit(results, mean_error, mae, rmse, mape, mapd, duree):
