@@ -11,6 +11,7 @@ import ARIMA
 import SES
 import HWES
 import SARIMA
+import GRU
 import Intro
 import View_data
 import View_benchmark
@@ -35,6 +36,7 @@ PAGES = {
     "AR": AR,
     "ARIMA": ARIMA,
     "SARIMA": SARIMA,
+    "GRU": GRU,
 }
 
 
@@ -101,3 +103,4 @@ else:
         page.app(df)
 
 # streamlit run D:\Equancy\Equancy_Local\Rendu\main.py
+# streamlit run C:\Users\bapti\Equancy\Rendu\main.py
