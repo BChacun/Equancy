@@ -12,6 +12,7 @@ import SES
 import HWES
 import SARIMA
 import GRU
+import LSTM
 import Intro
 import View_data
 import View_benchmark
@@ -37,6 +38,7 @@ PAGES = {
     "ARIMA": ARIMA,
     "SARIMA": SARIMA,
     "GRU": GRU,
+    "LSTM": LSTM
 }
 
 
