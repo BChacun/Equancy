@@ -18,13 +18,13 @@ def app(df):
             Nous somme actuellement étudiants en 2ème année (Bac +4) de la formation Ingénieur Généraliste IMT Atlantique. Dans le cadre
             de l'Unité d'Enseignement "Projet Commande Entreprise", nous avons choisi le sujet suivant, proposé et suivi par le cabinet de
              conseil Equancy: 'Benchmark des bibliothèques Prophet & Kats'. Cela nous a permis de développer nos compétences sur l'analyse et
-             la prévision de séries temporelles (domaine nouveau pour nous) et sur l'utilisation des librairies assciées sur Python. 
+             la prévision de séries temporelles (domaine nouveau pour nous) et sur l'utilisation des librairies associées sur Python. 
          """)
     st.write('------------------------------------------------------------------------------------------------------------------------')
     c3, c4, c5 = st.columns(3)
     c4.image('Equancy/Rendu/logos_all.png')
     st.write('------------------------------------------------------------------------------------------------------------------------')
-    st.markdown('<span style="color: #26B260">Dernière mise à jour: 04/12/2021</span>', unsafe_allow_html=True)
+    st.markdown('<span style="color: #26B260">Dernière mise à jour: 05/12/2021</span>', unsafe_allow_html=True)
     st.markdown('Site IMT Atlantique : https://www.imt-atlantique.fr/fr</a>', unsafe_allow_html=True)
     st.markdown('Site Equancy : https://www.equancy.fr/fr/</a>', unsafe_allow_html=True)
     st.markdown('Contact : lucas.fourest@imt-atlantique.net')

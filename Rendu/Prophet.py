@@ -1,17 +1,28 @@
-from datetime import time
-import time
-import streamlit as st
-import pandas as pd
-import math
-from sklearn.metrics import *
-from math import sqrt
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Dec  2 11:34:21 2021
 
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
+@author: jason
+"""
+import math
+
+import numpy as np
+import pandas as pd
+from sklearn.metrics import mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
+import fbprophet
+import copy
+import time
+import matplotlib.pyplot as plt
+import streamlit as st
+from math import sqrt
 
 
 def separate_data(data, frac):
     ind = math.floor(frac * len(data))
     train = data[:ind]
+    train = train.to_frame()
+    train = train.reset_index()
+    train.rename(columns={'weekDate': 'ds', 'quantity_weekly': 'y'}, inplace=True)
     test = data[ind:]
     return train, test
 
@@ -25,65 +36,56 @@ def indicateurs_stats(test, predictions):
     return mean_error, mae, rmse, mape, mapd
 
 
-results, mean_error, mae, rmse, mape, mapd, duree, S_prec = None, None, None, None, None, None, None, None
-change = False
+results, mean_error, mae, rmse, mape, mapd, duree = None, None, None, None, None, None, None
 data_prec = None
 
 def app(df):
-    st.markdown('<h1><center><span style="color:#00BFFF"><U>HWES</U></center></h1>', unsafe_allow_html=True)
-    st.markdown('<h0><center>_Holt-Winters Exponential Smoothing_</center></h1>', unsafe_allow_html=True)
+    st.markdown('<h1><center><span style="color:#00BFFF"><U>Prophet</U></center></h1>', unsafe_allow_html=True)
+    st.markdown('<h0><center>_Facebook Prophet_</center></h1>', unsafe_allow_html=True)
 
-    def HWES(S):
+    def Prophet():
 
-        # Split dataset
-        res = separate_data(df, 0.8)
-        train, test = res[0], res[1]
+        train, test = separate_data(df, 0.8)
 
-        # Train model
+        # Training
         start = time.time()
-        model = ExponentialSmoothing(train.values,trend='add',seasonal='add',initialization_method="estimated", seasonal_periods=S)
-        model_fit = model.fit(optimized=True)
+        model = fbprophet.Prophet(yearly_seasonality=True)
+        model.fit(train)
 
-        # Make predictions
-        prediction = model_fit.forecast(len(test))
-        predictions = pd.Series(prediction, index=test.index)
+        # Forecasting
+        future = test.to_frame().copy()
+        future = future.reset_index()
+        future.rename(columns={'weekDate': 'ds', 'quantity_weekly': 'y'}, inplace=True)
+        future.drop('y', axis=1, inplace=True)
+
+        forecast = model.predict(future)
+        predictions = forecast[['ds', 'yhat']]
+
+        predictions.set_index("ds", inplace=True)
+        predictions = predictions.squeeze()
         end = time.time()
-        duree = end-start
+        duree = end - start
         mean_error, mae, rmse, mape, mapd = indicateurs_stats(test, predictions)
-
         # Create results
+
         results = df
         results = results.to_frame()
         results["Prediction"] = predictions
+
         return results, mean_error, mae, rmse, mape, mapd, duree
 
-    global results, mean_error, mae, rmse, mape, mapd, duree, change, S_prec
+    global results, mean_error, mae, rmse, mape, mapd, duree
     global data_prec
 
-    st.markdown('<h5><U>Parameters :</U></h5>', unsafe_allow_html=True)
-    container = st.expander("View parameters")
-    S = container.slider('S', min_value=1, max_value=50, value=49, step=1)
-    if S_prec != S:
-        S_prec = S
-        change = True
-    st.write("Seasonal periods = ", S)
     if results is None:
         data_prec = df
         with st.spinner('Wait for it: 1st loading'):
-            results, mean_error, mae, rmse, mape, mapd, duree = HWES(S)
-            change = False
-
-    elif change:
-        data_prec = df
-        with st.spinner('Wait for it: reloading'):
-            results, mean_error, mae, rmse, mape, mapd, duree = HWES(S)
-            change = False
+            results, mean_error, mae, rmse, mape, mapd, duree = Prophet()
 
     elif not df.equals(data_prec):
         data_prec = df
         with st.spinner('Wait for it: data has changed'):
-            results, mean_error, mae, rmse, mape, mapd, duree = HWES(S)
-            change = False
+            results, mean_error, mae, rmse, mape, mapd, duree = Prophet()
 
     def plot_streamlit(results, mean_error, mae, rmse, mape, mapd, duree):
         st.markdown('<h5><U>Results :</U></h5>', unsafe_allow_html=True)

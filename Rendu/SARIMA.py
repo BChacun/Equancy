@@ -65,8 +65,8 @@ def app(df):
     global change
 
     st.markdown('<h5><U>Parameters :</U></h5>', unsafe_allow_html=True)
-
-    c1, c2 = st.columns(2)
+    container = st.expander("View parameters")
+    c1, c2 = container.columns(2)
     p = c1.number_input('Choose p', min_value=1, max_value=100, value=1, step=1)
     if p_prec != p:
         p_prec = p

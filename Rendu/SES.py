@@ -72,7 +72,8 @@ def app(df):
         with st.spinner('Wait for it: data has changed'):
             results, mean_error, mae, rmse, mape, mapd, duree, exp_smoothing = SES()
 
-    st.write("α = ", exp_smoothing)
+    with st.expander("View parameters"):
+        st.write("α = ", exp_smoothing)
 
     def plot_streamlit(results, mean_error, mae, rmse, mape, mapd, duree):
         st.markdown('<h5><U>Results :</U></h5>', unsafe_allow_html=True)

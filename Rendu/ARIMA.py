@@ -62,15 +62,16 @@ def app(df):
     global p_prec, d_prec, q_prec, change
 
     st.markdown('<h5><U>Parameters :</U></h5>', unsafe_allow_html=True)
-    p = st.number_input('Choose p', min_value=1, max_value=100, value=30, step=1)
+    container = st.expander("View parameters")
+    p = container.number_input('Choose p', min_value=1, max_value=100, value=30, step=1)
     if p_prec != p:
         p_prec = p
         change = True
-    d = st.number_input('Choose d', min_value=0, max_value=2, value=1, step=1)
+    d = container.number_input('Choose d', min_value=0, max_value=2, value=1, step=1)
     if d_prec != d:
         d_prec = d
         change = True
-    q = st.number_input('Choose q', min_value=0, max_value=100, value=10, step=1)
+    q = container.number_input('Choose q', min_value=0, max_value=100, value=10, step=1)
     if q_prec != q:
         q_prec = q
         change = True

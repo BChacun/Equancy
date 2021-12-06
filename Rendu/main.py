@@ -10,9 +10,22 @@ import AR
 import ARIMA
 import SES
 import HWES
+import streamlit as st
+import pandas as pd
+import plotly.graph_objects as go
+import math
+from sklearn.metrics import *
+from math import sqrt
+import statistics
+# Pages :
+import AR
+import ARIMA
+import SES
+import HWES
 import SARIMA
 import GRU
 import LSTM
+import Prophet
 import Intro
 import View_data
 import View_benchmark
@@ -38,7 +51,8 @@ PAGES = {
     "ARIMA": ARIMA,
     "SARIMA": SARIMA,
     "GRU": GRU,
-    "LSTM": LSTM
+    "LSTM": LSTM,
+    "Prophet": Prophet
 }
 
 
@@ -47,6 +61,7 @@ PAGES = {
 def load_data(product_id, store_id):
     data = creation_database(product_id, store_id)
     return data
+
 
 # Liste des magasins et produits
 Store_ids = ['09', '36']
@@ -105,4 +120,3 @@ else:
         page.app(df)
 
 # streamlit run D:\Equancy\Equancy_Local\Rendu\main.py
-# streamlit run C:\Users\bapti\Equancy\Rendu\main.py

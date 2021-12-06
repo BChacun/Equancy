@@ -60,7 +60,8 @@ def app(df):
     global data_prec
 
     st.markdown('<h5><U>Parameters :</U></h5>', unsafe_allow_html=True)
-    p = st.number_input('Choose p', min_value=1, max_value=50, value=25, step=1)
+    container = st.expander("View parameters")
+    p = container.number_input('Choose p', min_value=1, max_value=50, value=25, step=1)
     if p_prec != p:
         p_prec = p
         change = True
