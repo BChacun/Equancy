@@ -1,5 +1,5 @@
 import streamlit as st
 
 
-def app(df):
+def app():
     st.markdown('PAS ENCORE IMPLEMENTE')
