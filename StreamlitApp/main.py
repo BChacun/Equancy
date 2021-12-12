@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from ModelPages import AR, ARIMA, GRU, HWES, LSTM, Prophet, SES, SARIMA
+from ModelPages import AR, ARIMA, GRU, HWES, LSTM, Prophet, SES, SARIMA, XGBoost
 from OtherPages import Intro, View_benchmark, View_data
 
 
@@ -41,7 +41,8 @@ def buildPages():
         "SARIMA": SARIMA,
         "GRU": GRU,
         "LSTM": LSTM,
-        "Prophet": Prophet
+        "Prophet": Prophet,
+        "XGBoost": XGBoost,
     }
     return pages
 
