@@ -78,7 +78,8 @@ def XGB_MODEL(n, df):
     
     train_for_supervised = series_to_supervised(train.values, n_in=6)
     
-    test_values = np.concatenate((train.values[:-6],test.values), axis = None)
+    test_values = train.values
+    
     
     #test_values = series_to_supervised(test_values.values, n_in=6)
     
@@ -90,17 +91,20 @@ def XGB_MODEL(n, df):
     model = XGBRegressor(objective='reg:squarederror', n_estimators=n)
     model.fit(trainX, trainy)
 
-    pred = []
+    
     for i in range(len_test):
+        
+        
         # construct an input for a new preduction
         indice = len_test-i
-        row = test_values[-(6+indice):-indice]
+        row = test_values[-6:]
         
         # make a one-step prediction
-        pred.append( model.predict(asarray([row]))[0] )
+        np.append( test_values, model.predict(asarray([row]))[0] )
 
 
     # Make predictions
+    pred = test_values[-26:]
     predictions = pd.Series(pred, index=test.index)
     end = time.time()
     duree = end - start
