@@ -6,6 +6,7 @@ import math
 from sklearn.metrics import *
 from math import sqrt
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
+import numpy as np
 
 
 def separate_data(data, frac):
@@ -50,6 +51,7 @@ def SES(df):
 
     # Make predictions
     prediction = model_fit.forecast(len(test))
+
     predictions = pd.Series(prediction, index=test.index)
     end = time.time()
     duree = end-start
@@ -72,7 +74,7 @@ def initStates(df):
 
 def changeStates(df):
     if not df.equals(st.session_state.state_dataset):
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.state_dataset = df
             st.session_state.resultsSES = SES(df)
 

@@ -83,10 +83,10 @@ def changeStates(p, d, q, df):
             st.session_state.state_d = d
         if q != st.session_state.state_q:
             st.session_state.state_q = q
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.resultsARIMA = ARIMA(p, d, q, df)
     if not df.equals(st.session_state.state_dataset):
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.state_dataset = df
             st.session_state.resultsARIMA = ARIMA(p, d, q, df)
 

@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from ModelPages import AR, ARIMA, GRU, HWES, LSTM, Prophet, SES, SARIMA, XGBoost
+from ModelPages import AR, ARIMA, GRU, HWES, LSTM, Prophet, SES, SARIMA, XGBoost, RandomForest
 from OtherPages import Intro, View_benchmark, View_data
 
 
@@ -8,7 +8,6 @@ from OtherPages import Intro, View_benchmark, View_data
 # sales_data.parquet, pour éviter que le chargement au démarrage prenne trop de temps)
 def load_data(PRODUCT_ID, STORE_ID):
     data_init = pd.read_csv(f'DataCSV\{PRODUCT_ID}_{STORE_ID}.csv')
-    data_init.head()
     data_init = data_init.assign(weekDate=lambda _df: pd.to_datetime(_df['weekDate'], format="%Y-%m-%d"))
     data = data_init.copy()
     data.set_index("weekDate", inplace=True)
@@ -40,9 +39,10 @@ def buildPages():
         "ARIMA": ARIMA,
         "SARIMA": SARIMA,
         "GRU": GRU,
-        "LSTM": LSTM,
+        "LSTM - Pytorch": LSTM,
         "Prophet": Prophet,
-        "XGBoost": XGBoost,
+        "Gradient Boosting": XGBoost,
+        "Random Forest": RandomForest
     }
     return pages
 
@@ -106,23 +106,24 @@ def buildSidebar(pages, Product_ids, Store_ids):
 # (A chaque fois qu'un widget est actionné, toutes les valeurs des widgets sont réinitialisées)
 def initStates():
     if 'valH' not in st.session_state:
-        st.session_state.valH = True
+        st.session_state.valH = True  # variable associée au bouton RETURN HOME
     if 'valS' not in st.session_state:
-        st.session_state.valS = Store_ids[0]
+        st.session_state.valS = Store_ids[0]  # variable associée à la selectbox pour choisir le magasin
     if 'valP' not in st.session_state:
-        st.session_state.valP = Product_ids[0]
+        st.session_state.valP = Product_ids[0]  # variable associée à la selectbox pour choisir le produit
     if 'valDV' not in st.session_state:
-        st.session_state.valDV = False
+        st.session_state.valDV = False  # variable associée au bouton View Data
     if 'valFV' not in st.session_state:
-        st.session_state.valFV = False
+        st.session_state.valFV = False  # variable associée au bouton View Forecasts
     if 'valmc' not in st.session_state:
-        st.session_state.valmc = 'None'
+        st.session_state.valmc = 'None'  # variable associée à la selectbox pour choisir le modèle de prévision
     if 'valR' not in st.session_state:
-        st.session_state.valR = False
+        st.session_state.valR = False  # varaible associée au bouton View Benchmark
     if 'valDF' not in st.session_state:
-        st.session_state.valDF = dataDict[Product_ids[0]][Store_ids[0]]
+        st.session_state.valDF = dataDict[Product_ids[0]][Store_ids[0]]  # variable associée à la pandas.Series
+                                                                         # selectionnée
     if 'valM' not in st.session_state:
-        st.session_state.valM = None
+        st.session_state.valM = None  # variable associée au fichier py du modèle choisi
 
 
 # Change les valeurs des variables associées aux widget de STORE_ID, PRODUCT_ID et model_choice,
@@ -183,7 +184,6 @@ def mainApp(pages, dataDict, Product_ids, Store_ids):
 
     # On update les valeurs de ces variables en fonction des nouvelles valeurs des widgets
     changeStates(STORE_ID, PRODUCT_ID, model_choice, pages, dataDict)
-
     # On update les valeurs de ces variables en fonction de ce sur quoi on a cliqué
     if button_home:
         onClickHome()
@@ -193,18 +193,17 @@ def mainApp(pages, dataDict, Product_ids, Store_ids):
         onClickForecasts()
     if button_results:
         onClickResults()
-
     # On gère l'affichage des pages
-    if st.session_state.valH:
+    if st.session_state.valH:  # Si on a cliqué sur le bouton RETURN HOME, on affiche la page d'accueil
         Intro.app()
-    if st.session_state.valDV:
+    if st.session_state.valDV:  # Si on cliqué sur le bouton View Data, on affiche la page pour voir la data
         View_data.app(st.session_state.valDF, st.session_state.valP, st.session_state.valS)
-    if st.session_state.valFV and st.session_state.valmc != 'None':
+    if st.session_state.valFV and st.session_state.valmc != 'None': # Si on a cliqué sur le bouton View Forecasts et qu'on a bien selectionné un modèle, on affiche la page des prévisions
         st.session_state.valM.app(st.session_state.valDF)
-    if st.session_state.valFV and st.session_state.valmc == 'None':
+    if st.session_state.valFV and st.session_state.valmc == 'None': # Si on a cliqué sur le bouton View Forecasts et qu'on a bien selectionné un modèle, on affiche une erreur
         st.markdown('<h2><center>You must choose a model to see the forecasts</center></h2>', unsafe_allow_html=True)
         st.image('Pictures/errorSymbol.jpg')
-    if st.session_state.valR:
+    if st.session_state.valR: # Si on a cliqué sur le bouton View Benchmark, on affiche la page des résultats du Benchmark
         View_benchmark.app()
 
 

@@ -75,10 +75,10 @@ def initStates(S, df):
 def changeStates(S, df):
     if S != st.session_state.state_S:
         st.session_state.state_S = S
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.resultsHWES = HWES(S, df)
     if not df.equals(st.session_state.state_dataset):
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.state_dataset = df
             st.session_state.resultsAR = HWES(S, df)
 

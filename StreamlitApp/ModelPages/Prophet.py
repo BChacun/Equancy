@@ -80,7 +80,7 @@ def initStates(df):
 
 def changeStates(df):
     if not df.equals(st.session_state.state_dataset):
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.state_dataset = df
             st.session_state.resultsProphet = Prophet(df)
 

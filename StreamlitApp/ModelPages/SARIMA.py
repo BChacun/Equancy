@@ -81,10 +81,10 @@ def changeStates(param, param_seasonal, df):
             st.session_state.state_p = param
         if param_seasonal != st.session_state.state_param_seasonal:
             st.session_state.state_d = param_seasonal
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.resultsSARIMA = SARIMA(param, param_seasonal, df)
     if not df.equals(st.session_state.state_dataset):
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.state_dataset = df
             st.session_state.resultsSARIMA = SARIMA(param, param_seasonal, df)
 

@@ -44,7 +44,7 @@ def plot_streamlit(results, mean_error, mae, rmse, mape, mapd, duree):
 
 
 def GRU_MODEL(l, ep, df):
-
+    ep = int(ep)
     # Split dataset
     res = separate_data(df, 0.8)
     train, test = res[0], res[1]
@@ -119,10 +119,10 @@ def changeStates(l, ep, df):
             st.session_state.state_l = l
         if ep != st.session_state.state_ep:
             st.session_state.state_ep = ep
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.resultsGRU = GRU_MODEL(l, ep, df)
     if not df.equals(st.session_state.state_dataset):
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.state_dataset = df
             st.session_state.resultsARIMA = GRU_MODEL(l, ep, df)
 

@@ -43,11 +43,11 @@ def plot_streamlit(results, mean_error, mae, rmse, mape, mapd, duree):
     st.write(f'<li><em>MAPE : </em>{round(mape, 3)} </li>', unsafe_allow_html=True)
     st.write(f'<li><em>MAPD : </em>{round(mapd, 3)} </li>', unsafe_allow_html=True)
     st.write('<li><em>Temps de calcul de la prévision : </em>%.3f s</li>' % duree, unsafe_allow_html=True)
-    
-    
+
+
 # transform a time series dataset into a supervised learning dataset
 def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
-    n_vars = 1 
+    n_vars = 1
     df = pd.DataFrame(data)
     cols = list()
     # input sequence (t-n, ... t-1)
@@ -65,46 +65,40 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
 
 
 def XGB_MODEL(n, df):
-    
-    
+    n = int(n)
 
     # Split dataset
     res = separate_data(df, 0.8)
     train, test = res[0], res[1]
     len_test = len(test)
-    
-    
+
     # transform the time series data into supervised learning
-    
+
     train_for_supervised = series_to_supervised(train.values, n_in=6)
-    
+
     test_values = train.values
-    
-    
-    #test_values = series_to_supervised(test_values.values, n_in=6)
-    
+
+    # test_values = series_to_supervised(test_values.values, n_in=6)
+
     # split into input and output columns
     trainX, trainy = train_for_supervised[:, :-1], train_for_supervised[:, -1]
 
     start = time.time()
     # fit model
+
     model = XGBRegressor(objective='reg:squarederror', n_estimators=n)
     model.fit(trainX, trainy)
 
-    
     for i in range(len_test):
-        
-        
         # construct an input for a new preduction
-        indice = len_test-i
+        indice = len_test - i
         row = test_values[-6:]
-        
-        # make a one-step prediction
-        np.append( test_values, model.predict(asarray([row]))[0] )
 
+        # make a one-step prediction
+        np.append(test_values, model.predict(asarray([row]))[0])
 
     # Make predictions
-    pred = test_values[-26:]
+    pred = test_values[-len_test:]
     predictions = pd.Series(pred, index=test.index)
     end = time.time()
     duree = end - start
@@ -128,7 +122,7 @@ def initStates(n, df):
 
 
 def changeStates(n, df):
-    if n != st.session_state.state_n :
+    if n != st.session_state.state_n:
         if n != st.session_state.state_n:
             st.session_state.state_n = n
         with st.spinner('Wait for it: parameters have changed...'):
@@ -141,7 +135,7 @@ def changeStates(n, df):
 
 def inputParameters():
     container = st.expander("View parameters")
-    
+
     n = container.number_input('Choose n_estimators', min_value=10, max_value=100000, value=1000, step=100)
     return n
 

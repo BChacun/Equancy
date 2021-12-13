@@ -32,6 +32,8 @@ def plot_streamlit(results, mean_error, mae, rmse, mape, mapd, duree):
     st.write(results)
     # Plots :
     st.line_chart(data=results, width=0, height=0, use_container_width=True)
+    st.write("Le modèle LSTM de Pytorch donne de mauvais résultats car les hyperparamètres n'ont pas été optimisés et "
+             "le modèle a été peu entraîné")
     st.markdown('<h5><U>Indicators :</U></h5>', unsafe_allow_html=True)
     st.markdown('<li><em>Mean Error : </em>%.3f</li>' % mean_error, unsafe_allow_html=True)
     st.write('<li><em>MAE : </em>%.3f</li>' % mae, unsafe_allow_html=True)
@@ -153,10 +155,10 @@ def changeStates(l, ep, df):
             st.session_state.state_l = l
         if ep != st.session_state.state_ep:
             st.session_state.state_ep = ep
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.resultsGRU = LSTM_MODEL(l, ep, df)
     if not df.equals(st.session_state.state_dataset):
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.state_dataset = df
             st.session_state.resultsARIMA = LSTM_MODEL(l, ep, df)
 
@@ -169,7 +171,7 @@ def inputParameters():
 
 
 def app(df):
-    st.markdown('<h1><center><span style="color:#00BFFF"><U>LSTM</U></center></h1>', unsafe_allow_html=True)
+    st.markdown('<h1><center><span style="color:#00BFFF"><U>LSTM Pytorch</U></center></h1>', unsafe_allow_html=True)
     st.markdown('<h0><center>_Long Short-Term Memory_</center></h1>', unsafe_allow_html=True)
     st.markdown('<h5><U>Parameters :</U></h5>', unsafe_allow_html=True)
     ep, l = inputParameters()

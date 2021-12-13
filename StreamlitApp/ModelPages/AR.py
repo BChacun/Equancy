@@ -79,10 +79,10 @@ def initStates(p, df):
 def changeStates(p, df):
     if p != st.session_state.state_p:
         st.session_state.state_p = p
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.resultsAR = AR(p, df)
     if not df.equals(st.session_state.state_dataset):
-        with st.spinner('Wait for it: parameters have changed...'):
+        with st.spinner('Wait for it...'):
             st.session_state.state_dataset = df
             st.session_state.resultsAR = AR(p, df)
 
