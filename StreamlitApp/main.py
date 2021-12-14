@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from ModelPages import AR, ARIMA, GRU, HWES, LSTM, Prophet, SES, SARIMA, XGBoost, RandomForest
-from OtherPages import Intro, View_benchmark, View_data
+from OtherPages import Intro, View_data, View_benchmark
 
 
 # Fonction pour charger la data à partir d'un CSV (les CSV ont été pré-générés à partir du fichier
