@@ -6,3 +6,4 @@ sklearn
 statsmodels
 tensorflow
 torch
+fbprophet
