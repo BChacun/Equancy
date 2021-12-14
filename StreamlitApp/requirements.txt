@@ -2,8 +2,6 @@ pandas
 streamlit
 numpy
 datetime
-time
-math
 sklearn
 statsmodels
 tensorflow
