@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from ModelPages import AR, ARIMA, GRU, HWES, LSTM, Prophet, SES, SARIMA, XGBoost, RandomForest
+from ModelPages import AR, ARIMA, GRU, HWES, LSTM, Prophet, SES, SARIMA, RandomForest
 from OtherPages import Intro, View_data, View_benchmark
 
 
@@ -41,7 +41,6 @@ def buildPages():
         "GRU": GRU,
         "LSTM - Pytorch": LSTM,
         "Prophet": Prophet,
-        "Gradient Boosting": XGBoost,
         "Random Forest": RandomForest
     }
     return pages
