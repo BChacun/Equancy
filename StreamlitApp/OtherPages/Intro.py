@@ -8,8 +8,15 @@ def app():
     st.write('- **_Tuteur Entreprise_**: Hervé Mignot')
     st.write('------------------------------------------------------------------------------------------------------------------------')
     c1, c2 = st.columns(2)
-    c1.image('Pictures/Equancy_logo.png')
-    c2.image('Pictures/IMTA_logo.png')
+
+    # Si on veut travailler uniquement en local:
+    #  c1.image('Pictures/Equancy_logo.png')
+    # Si on veut travailler en local et/ou avec l'app déployée, alors on passe l'url de l'image sur github en argument
+    #  c1.image('https://github.com/BChacun/Equancy/blob/master/StreamlitApp/Pictures/errorSymbol.jpg?raw=true')
+    # De même pour les autres images
+
+    c1.image('https://github.com/BChacun/Equancy/blob/master/StreamlitApp/Pictures/Equancy_logo.png?raw=true')
+    c2.image('https://github.com/BChacun/Equancy/blob/master/StreamlitApp/Pictures/IMTA_logo.png?raw=true')
     st.write('------------------------------------------------------------------------------------------------------------------------')
     st.markdown("Cette application permet de prévoir les ventes d'un produit par semaine dans un magasin d'une enseigne alimentaire. L'utilisateur a à sa disposition plusieurs modèles de Statistiques, Machine Learning ou Deep Learning, et a la possibilité de modifier certains paramètres pour certains modèles. Les prévisions sont affichées, ainsi que les performances du modèle sur le dataset de test. Une comparaison globale des modèles implémentés est accessible en cliquant sur le bouton 'View Benchmark Results'." )
     st.write('------------------------------------------------------------------------------------------------------------------------')
@@ -22,9 +29,9 @@ def app():
          """)
     st.write('------------------------------------------------------------------------------------------------------------------------')
     c3, c4, c5 = st.columns(3)
-    c4.image('Pictures/logos_all.png')
+    c4.image('https://github.com/BChacun/Equancy/blob/master/StreamlitApp/Pictures/logos_all.png?raw=true')
     st.write('------------------------------------------------------------------------------------------------------------------------')
-    st.markdown('<span style="color: #26B260">Dernière mise à jour: 09/12/2021</span>', unsafe_allow_html=True)
+    st.markdown('<span style="color: #26B260">Dernière mise à jour: 15/12/2021</span>', unsafe_allow_html=True)
     st.markdown('Site IMT Atlantique : https://www.imt-atlantique.fr/fr</a>', unsafe_allow_html=True)
     st.markdown('Site Equancy : https://www.equancy.fr/fr/</a>', unsafe_allow_html=True)
     st.markdown('Contact : lucas.fourest@imt-atlantique.net')

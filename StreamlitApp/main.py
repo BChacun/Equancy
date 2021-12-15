@@ -7,7 +7,12 @@ from OtherPages import Intro, View_data, View_benchmark
 # Fonction pour charger la data à partir d'un CSV (les CSV ont été pré-générés à partir du fichier
 # sales_data.parquet, pour éviter que le chargement au démarrage prenne trop de temps)
 def load_data(PRODUCT_ID, STORE_ID):
-    data_init = pd.read_csv(f'DataCSV\{PRODUCT_ID}_{STORE_ID}.csv')
+    data_init = pd.read_csv(f'https://github.com/BChacun/Equancy/blob/4eff4975e4385b3fbed9f165c7502af2d8f5935f/StreamlitApp/DataCSV/{PRODUCT_ID}_{STORE_ID}.csv?raw=true')
+    # Si on veut travailler uniquement en local:
+    #  data_init = pd.read_csv(f'DataCSV\{PRODUCT_ID}_{STORE_ID}.csv')
+    # Si on veut travailler en local et/ou avec l'app déployée, alors on passe l'url du fichier csv sur github en argument
+    #  data_init = pd.read_csv(f'https://github.com/BChacun/Equancy/blob/4eff4975e4385b3fbed9f165c7502af2d8f5935f/StreamlitApp/DataCSV/{PRODUCT_ID}_{STORE_ID}.csv?raw=true')
+
     data_init = data_init.assign(weekDate=lambda _df: pd.to_datetime(_df['weekDate'], format="%Y-%m-%d"))
     data = data_init.copy()
     data.set_index("weekDate", inplace=True)
@@ -201,7 +206,13 @@ def mainApp(pages, dataDict, Product_ids, Store_ids):
         st.session_state.valM.app(st.session_state.valDF)
     if st.session_state.valFV and st.session_state.valmc == 'None': # Si on a cliqué sur le bouton View Forecasts et qu'on a bien selectionné un modèle, on affiche une erreur
         st.markdown('<h2><center>You must choose a model to see the forecasts</center></h2>', unsafe_allow_html=True)
-        st.image('Pictures/errorSymbol.jpg')
+
+        # Si on veut travailler uniquement en local:
+        #  st.image('Pictures/errorSymbol.jpg')
+        # Si on veut travailler en local et/ou avec l'app déployée, alors on passe l'url de l'image sur github en argument
+        #  st.image('https://github.com/BChacun/Equancy/blob/master/StreamlitApp/Pictures/errorSymbol.jpg?raw=true')
+
+        st.image('https://github.com/BChacun/Equancy/blob/master/StreamlitApp/Pictures/errorSymbol.jpg?raw=true')
     if st.session_state.valR: # Si on a cliqué sur le bouton View Benchmark, on affiche la page des résultats du Benchmark
         View_benchmark.app()
 
